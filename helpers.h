@@ -12,9 +12,24 @@
 
 */
 
+
+static bool bfs(const BipartiteGraph& G);
+static bool dfs(int u, const BipartiteGraph& G);
+
 void print_graph(BipartiteGraph g);
 
-double hopcroft_karp(BipartiteGraph g);
+
+/*
+Use BFS to build tree
+Use DFS to find augumenting paths
+Stop when no more augmenting paths exist
+
+@param g Graph that we are going to urn Hopcroft Karp on
+
+
+returns the size of the matching
+*/
+double hopcroft_karp(const BipartiteGraph& G);
 
 double max_flow(BipartiteGraph g);
 

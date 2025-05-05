@@ -23,9 +23,11 @@ int main(){
 
     //let's test with deletions
 
+    cout<<"The maximum matching found is: " << hopcroft_karp(G);
 
 
-    while(!fi.eof()){
+
+    /*while(!fi.eof()){
         int u, v;
         fi >> u >> v;
 
@@ -34,7 +36,7 @@ int main(){
         print_graph(G);
     }
 
-    fi.close();
+    fi.close();*/
 
     return 0;
 }
