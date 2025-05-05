@@ -1,7 +1,8 @@
+//bipartite.cpp
 #include <fstream>
 #include <string>
 #include <vector>
-#include "bipartite.h";
+#include "bipartite.h"
 
 
 using namespace std;
@@ -85,8 +86,8 @@ void BipartiteGraph::add_edge(int u, int v , double capacity){
 
     //TODO: add error if edge already exists
 
-    Edge edge_1 = {v, capacity, 0.0, 0.0};
-    Edge edge_2 = {u, capacity, 0.0, 0.0};
+    Edge edge_1 = {v, capacity, 0.0, 0};
+    Edge edge_2 = {u, capacity, 0.0, 0};
 
     edge_list[u].push_back(edge_1);
     edge_list[v].push_back(edge_2);
@@ -104,7 +105,7 @@ void BipartiteGraph::remove_edge(int u, int v){
     int index2 = nodes[v].incident_edges[u];
 
     edge_list[u].erase(edge_list[u].begin() + index1);
-    edge_list[v].erase(edge_list[u].begin() + index2);
+    edge_list[v].erase(edge_list[v].begin() + index2);
 
     nodes[u].incident_edges[v] = -1;
     nodes[v].incident_edges[u] = -1;

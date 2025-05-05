@@ -1,6 +1,6 @@
 // helper functions
-
-#include "bipartite.h";
+#pragma once
+#include "bipartite.h"
 
 /* here we are going to have: 
 

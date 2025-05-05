@@ -1,5 +1,6 @@
-// graph implementation
+// graph implementation bipartite.h
 
+#pragma once
 #include <vector>
 #include <string>
 #include <map>
