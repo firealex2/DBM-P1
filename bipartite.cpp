@@ -15,9 +15,12 @@ BipartiteGraph::BipartiteGraph(string file_name){
 
 
     // here we are going to read the number of nodes and then the edges
+    nr_nodes = nr_edges = 0;
 
     int n;
     fi >> n;
+
+    nr_nodes++;
 
     for(int i=0;i<n;i++){
         
@@ -47,6 +50,8 @@ BipartiteGraph::BipartiteGraph(string file_name){
             nodes[u].partition = 1;
             L.push_back(u);
         }
+
+        nr_edges++;
 
     }
 
@@ -109,5 +114,7 @@ void BipartiteGraph::remove_edge(int u, int v){
 
     nodes[u].incident_edges[v] = -1;
     nodes[v].incident_edges[u] = -1;
+
+    nr_edges--;
 
 }

@@ -9,9 +9,6 @@ using namespace std;
 static map<int, int> pair_u, pair_v, dist;
 
 
-
-
-
 void print_graph(BipartiteGraph G){
     cout<<"Left partition (L): ";
 
