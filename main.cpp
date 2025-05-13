@@ -3,6 +3,7 @@
 #include <fstream>
 #include "bipartite.h"
 #include "helpers.h"
+#include "congestion_balancing.h"
 
 
 using namespace std;
@@ -11,6 +12,8 @@ using namespace std;
 ifstream fi("remove3.txt");
 
 int main(){
+
+
 
     string test_name;
 
@@ -23,20 +26,48 @@ int main(){
 
     //let's test with deletions
 
-    cout<<"The maximum matching found is: " << hopcroft_karp(G);
+
+    double epsilon, mu;
+
+    cout<<"please enter epsilon: ";
+    cin>>epsilon;
+
+    int phase_counter = 0;
+
+    mu =  hopcroft_karp(G);
+
+    cout<<"This is before phase start just initial data:\n";
+    cout<<"The maximum matching found is: " << mu;
+    cout<<"\n\n";
 
 
 
-    /*while(!fi.eof()){
+    double value = 0;
+
+    while(!fi.eof()){
         int u, v;
         fi >> u >> v;
 
-        G.remove_edge(u, v);
 
-        print_graph(G);
+
+        value += G.remove_edge(u, v);
+
+        
+        if(value >= epsilon * mu){
+            //start phase
+            cout<<"Start phase "<<++phase_counter;
+            print_graph(G);
+
+            robust_matching(G, mu, epsilon);
+
+
+            value = 0;
+        }
+
+        //print_graph(G);
     }
 
-    fi.close();*/
+    fi.close();
 
     return 0;
 }

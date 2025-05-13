@@ -5,6 +5,7 @@
 #include <vector>
 #include <map>
 #include <algorithm>
+#include <cmath>
 
 #include "bipartite.h"
 #include "helpers.h"
@@ -65,10 +66,49 @@ double FlowNetwork::dfs(int v, int t, double pushed, double delta){
 
     if (v == t) return pushed;
 
+    for(int &id = ptr[v]; id < (int)adj[v].size(); id++){
+
+        FlowEdge &e = adj[v][id];
+
+        if(level[v] + 1 != level[e.to] || e.capacity - e.flow < delta) continue;
+
+        double tr = dfs(e.to, t, min(pushed, e.capacity - e.flow), delta);
+
+        if(tr > 0){
+            e.flow += tr;
+            adj[e.to][e.rev].flow -= tr;
+            return tr;
+        }
+
+    }
+
+    return 0;
+
 }
 
 double FlowNetwork::max_flow(int s, int t){
+    double flow = 0;
+    double max_capacity = 0;
 
+    //find max capacity
+    for (int i = 0; i < n; i++){
+        for(auto &e : adj[i]){
+            max_capacity = max(max_capacity, e.capacity);
+        }
+    }
+
+    for (double delta = pow(2, floor(log2(max_capacity))); delta >= 1e-9; delta/=2){
+        
+        while(bfs(s, t, delta)) {
+            ptr.assign(n, 0);
+            while (double pushed = dfs(s, t, INF, delta)){
+                flow += pushed;
+            }
+        }
+
+    }
+
+    return flow;
 }
 
 
@@ -107,19 +147,88 @@ FlowNetwork build_flow_network(BipartiteGraph &G){
 }
 
 
-int matching_or_cut(BipartiteGraph& G, int mu, double epsilon, map<Node, int>& SL, map<Node, int>& SR){
+double matching_or_cut(BipartiteGraph& G, double mu, double epsilon, map<Node, int>& SL, map<Node, int>& SR){
+
+    int n = G.nr_nodes;
+    int s = n;
+    int t = n + 1;
+
+    //make flow network out of the graph
+    FlowNetwork F = build_flow_network(G);
+    F.n = n + 2;
+
+
+    double threshold = G.L.size() * (1 - 4 * epsilon);
+    double flow = F.max_flow(s, t);
+
+    //check flow (fractional matching size)
+
+    if(flow >= threshold) {
+        //it is good
+
+        return flow;
+    }
+
+    vector<bool> reachable(F.n, false);
+
+    queue<int> Q;
+    Q.push(s);
+    reachable[s] = true;
+
+
+    while(!Q.empty()) {
+        int u = Q.front();
+        Q.pop();
+
+
+        for(FlowEdge& e : F.adj[u]){
+            
+            if(!reachable[e.to] && (e.capacity - e.flow) >= 1e-9) {
+                reachable[e.to] = true;
+                Q.push(e.to);
+            }
+
+        }
+
+    }
+
+    SL.clear();
+    SR.clear();
+
+
+    cout<<"SL creation: \n";
+    for(int u : G.L){
+        
+        if(reachable[u]){
+            cout<<u;
+            SL[G.nodes[u]] = 1;
+        }
+    }
+    cout<<"SR creation: \n";
+    for(int u : G.R){
+        
+        if(!reachable[u]){
+            cout<<u;
+            SR[G.nodes[u]] = 1;
+        }
+    }
+
+    cout<<"\n";
+    return -1;
+
 
 }
 
-bool matching_too_small(BipartiteGraph& G, int mu, double epsilon){
+bool matching_too_small(BipartiteGraph& G, double& mu, double epsilon){
 
-    int m = hopcroft_karp(G);
+    double aux = mu;
+    mu = hopcroft_karp(G);
 
-    return (m < mu*(1 - 2*epsilon)) ? true : false; 
+    return (mu < aux*(1 - 2*epsilon)) ? true : false; 
 
 }
 
-void robust_matching(BipartiteGraph& G, int mu, double epsilon){
+void robust_matching(BipartiteGraph& G, double& mu, double epsilon){
 
     // we need the size of L to ne a power of 2.
     // otherwise replace  with n = 2^[log(n)]
@@ -129,20 +238,12 @@ void robust_matching(BipartiteGraph& G, int mu, double epsilon){
 
     //init the k(e) = 1/n for each edge
 
-    int n = G.nr_nodes;
-
-    for(int i = 0; i < n; i++){
-            
-        for(Edge& e : G.edge_list[i]){
-            e.capacity = 1.0 / n;
-        }    
-
-    }
 
     //begin new phase
 
     //if matching too small we return
     if(matching_too_small(G, mu, epsilon)){
+        cout<<"Matching too small"<<endl;
         return;
     }
 
@@ -156,12 +257,14 @@ void robust_matching(BipartiteGraph& G, int mu, double epsilon){
     SL.clear();
     SR.clear();
 
-
+    double flow = 0;
     //while we do not find a matching
-    while (matching_or_cut(G, mu, epsilon, SL, SR) == INT_MAX) {
+    while ((flow = matching_or_cut(G, mu, epsilon, SL, SR)) < 0) {
 
         //work on the sets
         //find the edges from SL to R\SR
+        cout<<"Current threshold for matching: "<<mu * (1 - 4 * epsilon);
+
 
         for(const auto& [node, value] : SL){
             
@@ -182,6 +285,8 @@ void robust_matching(BipartiteGraph& G, int mu, double epsilon){
 
         SL.clear();
         SR.clear();
+
+        cout<<"We got flow : "<<flow<<"\n";
     }
 
 

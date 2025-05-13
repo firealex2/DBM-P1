@@ -62,6 +62,16 @@ BipartiteGraph::BipartiteGraph(string file_name){
         }
     }
 
+    int L_n = L.size();
+
+    for(int i = 0; i < nr_nodes; i++){
+            
+        for(Edge& e : edge_list[i]){
+            e.capacity = 1.0 / L_n;
+        }    
+
+    }
+
 
     fi.close();
 
@@ -102,12 +112,16 @@ void BipartiteGraph::add_edge(int u, int v , double capacity){
 
 }
 
-void BipartiteGraph::remove_edge(int u, int v){
+double BipartiteGraph::remove_edge(int u, int v){
 
     //TODO: add error if edge does not exist
 
+    
+
     int index1 = nodes[u].incident_edges[v];
     int index2 = nodes[v].incident_edges[u];
+
+    double value = edge_list[u][index1].capacity;
 
     edge_list[u].erase(edge_list[u].begin() + index1);
     edge_list[v].erase(edge_list[v].begin() + index2);
@@ -116,5 +130,7 @@ void BipartiteGraph::remove_edge(int u, int v){
     nodes[v].incident_edges[u] = -1;
 
     nr_edges--;
+
+    return value;
 
 }

@@ -6,10 +6,10 @@ CXXFLAGS := -std=c++17 -Wall -Wextra -O2
 TARGET := test-bipartite
 
 # Source files
-SRCS := main.cpp bipartite.cpp helpers.cpp
+SRCS := main.cpp bipartite.cpp helpers.cpp congestion_balancing.cpp
 
 # Header files
-HDRS := bipartite.h helpers.h
+HDRS := bipartite.h helpers.h congestion_balancing.h
 
 # Object files (replace .cpp with .o)
 OBJS := $(SRCS:.cpp=.o)

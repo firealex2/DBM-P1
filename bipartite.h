@@ -22,6 +22,10 @@ struct Node {
     int partition;
     //array that for each i returns the id in the global edges
     std::map<int, int> incident_edges;
+
+    bool operator<(const Node& other) const {
+        return id < other.id;
+    }
     
 
 };
@@ -52,7 +56,7 @@ public:
     BipartiteGraph(std::string file_name);
 
     void add_edge(int u, int v, double cap);
-    void remove_edge(int u, int v);
+    double remove_edge(int u, int v);
 
 
     

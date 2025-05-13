@@ -45,11 +45,11 @@ FlowNetwork build_flow_network(BipartiteGraph &G);
 
 
 
+double matching_or_cut(BipartiteGraph& G, double mu, double epsilon, map<Node, int>& SL, map<Node, int>& SR);
 
 
-void matching_or_cut(BipartiteGraph& G, int mu, double epsilon);
 
-bool matching_too_small(BipartiteGraph& G, int mu, double epsilon);
+bool matching_too_small(BipartiteGraph& G, double& mu, double epsilon);
 
-void robust_matching(BipartiteGraph& G, int mu, double epsilon);
+void robust_matching(BipartiteGraph& G, double& mu, double epsilon);
 
