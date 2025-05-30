@@ -5,6 +5,7 @@
 #include "bipartite.h"
 
 
+
 using namespace std;
 
 
@@ -20,7 +21,7 @@ BipartiteGraph::BipartiteGraph(string file_name){
     int n;
     fi >> n;
 
-    nr_nodes++;
+    nr_nodes=n;
 
     for(int i=0;i<n;i++){
         

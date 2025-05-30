@@ -9,7 +9,7 @@
 using namespace std;
 
 
-ifstream fi("remove3.txt");
+ifstream fi("removals_128.txt");
 
 int main(){
 
@@ -44,20 +44,38 @@ int main(){
 
     double value = 0;
 
-    while(!fi.eof()){
-        int u, v;
-        fi >> u >> v;
+    print_graph(G);
+
+
+    cout<<"I got here 1\n";
+
+
+    //robust_matching(G, mu, epsilon);
+
+    cout<<"I got here 2\n";
+            int u, v;
+
+    while(fi >> u >> v){
+
+
+
+        cout<<"I got here 2\n";
 
 
 
         value += G.remove_edge(u, v);
 
+        cout<<"I got here 3 and value is: "<< value << "\n";
+        cout<<"epsilon * mu = "<<epsilon * mu << endl;
         
         if(value >= epsilon * mu){
             //start phase
             cout<<"Start phase "<<++phase_counter;
-            print_graph(G);
+            //print_graph(G);
 
+
+
+            cout<<"We enter robust matching: ...\n";
             robust_matching(G, mu, epsilon);
 
 
