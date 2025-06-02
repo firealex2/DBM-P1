@@ -50,23 +50,26 @@ int main(){
     cout<<"I got here 1\n";
 
 
-    //robust_matching(G, mu, epsilon);
+    robust_matching(G, mu, epsilon);
 
     cout<<"I got here 2\n";
             int u, v;
 
-    while(fi >> u >> v){
+    print_graph(G);
+
+    while(fi>>u>>v){
 
 
+        
 
-        cout<<"I got here 2\n";
+        //cout<<"I got here 2\n";
 
 
 
         value += G.remove_edge(u, v);
 
-        cout<<"I got here 3 and value is: "<< value << "\n";
-        cout<<"epsilon * mu = "<<epsilon * mu << endl;
+        //cout<<"I got here 3 and value is: "<< value << "\n";
+       //cout<<"epsilon * mu = "<<epsilon * mu << endl;
         
         if(value >= epsilon * mu){
             //start phase

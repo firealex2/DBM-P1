@@ -113,25 +113,28 @@ void BipartiteGraph::add_edge(int u, int v , double capacity){
 
 }
 
-double BipartiteGraph::remove_edge(int u, int v){
+double BipartiteGraph::remove_edge(int u, int v) {
+    // Look up the stored index of (u→v)
+    auto it_uv = nodes[u].incident_edges.find(v);
+    if (it_uv == nodes[u].incident_edges.end() || it_uv->second < 0) {
+        // either it never existed or was already removed
+        return 0.0;
+    }
+    int idx_uv = it_uv->second;
+    double cap = edge_list[u][idx_uv].capacity;
 
-    //TODO: add error if edge does not exist
+    // “Disable” u→v by setting capacity to 0 and marking removed
+    edge_list[u][idx_uv].capacity = 0.0;
+    it_uv->second = -1;
 
-    
+    // Now do the same for the reverse entry (v→u)
+    auto it_vu = nodes[v].incident_edges.find(u);
+    if (it_vu != nodes[v].incident_edges.end() && it_vu->second >= 0) {
+        int idx_vu = it_vu->second;
+        edge_list[v][idx_vu].capacity = 0.0;
+        it_vu->second = -1;
+    }
 
-    int index1 = nodes[u].incident_edges[v];
-    int index2 = nodes[v].incident_edges[u];
-
-    double value = edge_list[u][index1].capacity;
-
-    edge_list[u].erase(edge_list[u].begin() + index1);
-    edge_list[v].erase(edge_list[v].begin() + index2);
-
-    nodes[u].incident_edges[v] = -1;
-    nodes[v].incident_edges[u] = -1;
-
-    nr_edges--;
-
-    return value;
-
+    --nr_edges;
+    return cap;
 }

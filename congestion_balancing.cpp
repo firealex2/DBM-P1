@@ -165,7 +165,7 @@ double matching_or_cut(BipartiteGraph& G, double mu, double epsilon, map<Node, i
 
 
     //double threshold = G.L.size() * (1 - epsilon);
-    double threshold = mu * (1 - 4 * epsilon);
+    double threshold = mu * (1 - 3 * epsilon);
     double flow = F.max_flow(s, t);
 
     //check flow (fractional matching size)
