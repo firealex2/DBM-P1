@@ -150,7 +150,7 @@ FlowNetwork build_flow_network(BipartiteGraph &G){
 }
 
 
-double matching_or_cut(BipartiteGraph& G, double mu, double epsilon, map<Node, int>& SL, map<Node, int>& SR){
+double matching_or_cut(BipartiteGraph& G, double mu, double epsilon, vector<bool> &SL, vector<bool> &SR, double &current_flow){
 
 
     fo<<"IN MATCHING OR CUT: \n"<<"-------------\n";
@@ -173,11 +173,15 @@ double matching_or_cut(BipartiteGraph& G, double mu, double epsilon, map<Node, i
     fo<<"FLOW CALCULATED IS: "<<flow<<" ----------- "<<endl;
     fo<<"THRESHOLD IS: "<< threshold<<" ----------- "<<endl;
 
+    current_flow = flow;
+
     if(flow >= threshold) {
         //it is good
 
         return flow;
     }
+
+
 
     vector<bool> reachable(F.n, false);
     fo<<"Fn = "<<F.n <<endl;
@@ -210,8 +214,11 @@ double matching_or_cut(BipartiteGraph& G, double mu, double epsilon, map<Node, i
 
     }
 
-    SL.clear();
-    SR.clear();
+    // SL.clear();
+    // SR.clear();
+
+    fill(SL.begin(), SL.end(), false);
+    fill(SR.begin(), SR.end(), false);
 
 
     fo<<"SL creation: \n";
@@ -219,7 +226,7 @@ double matching_or_cut(BipartiteGraph& G, double mu, double epsilon, map<Node, i
         
         if(reachable[u]){
             fo<<u << " ";
-            SL[G.nodes[u]] = 1;
+            SL[u] = true;
         }
     }
     fo<<"\nSR creation: \n";
@@ -227,7 +234,7 @@ double matching_or_cut(BipartiteGraph& G, double mu, double epsilon, map<Node, i
         
         if(reachable[u]){
             fo<<u<<" ";
-            SR[G.nodes[u]] = 1;
+            SR[u] = true;
         }
     }
 
@@ -244,7 +251,7 @@ bool matching_too_small(BipartiteGraph& G, double& mu, double epsilon){
     double aux = mu;
     mu = hopcroft_karp(G);
 
-    print_graph(G);
+    //print_graph(G);
 
     fo<<"CALCULATED MU IS: "<<mu<<endl;
 
@@ -281,48 +288,95 @@ void robust_matching(BipartiteGraph& G, double& mu, double epsilon){
     // SL.clear();
     // SR.clear();
 
-    map<Node, int> SL, SR;
+    // map<Node, int> SL, SR;
 
-    SL.clear();
-    SR.clear();
+    // SL.clear();
+    // SR.clear();
+
+    //initialize the cuts as bool 
+    vector <bool> SL (G.nr_nodes, false);
+    vector <bool> SR (G.nr_nodes, false);
+
+    // vector <bool> prev_SL (G.nr_nodes, false);
+    // vector <bool> prev_SR (G.nr_nodes, false);
+
+
+
+
 
     double flow = 0;
+    double prev_flow = -1;
+    double current_flow = 0;
     //while we do not find a matching
-    while ((flow = matching_or_cut(G, mu, epsilon, SL, SR)) < 0) {
+    while (true) {
 
             fo<<"NEW MU is: "<<mu<<endl;
 
+        bool doubled_any = false;
+
         //work on the sets
         //find the edges from SL to R\SR
-        //fo<<"Current threshold for matching: "<<mu * (1 - 4 * epsilon);
+        //cout<<"Current threshold for matching: "<<mu * (1 - 4 * epsilon)<<endl;
+
+
+        double flow = matching_or_cut(G, mu, epsilon, SL, SR, current_flow);
+
+        cout<<prev_flow << " " << current_flow << endl;
+
+        if(flow >= 0 ){
+            cout<<"Exited bc found good flow\n";
+            return;
+        }
+
+        if(prev_flow == current_flow){
+            cout<<"Exited bc hard cap on doubling\n";
+            return;
+        }
+
+        prev_flow = current_flow;
 
         fo<<"flow is: "<<flow<<endl;
 
-        for(const auto& [node, value] : SL){
-            
-            //go through edges of each node
+        // if(SL == prev_SL && SR == prev_SR){
+        //     return;
+        // }
 
-            for(const auto& [to, position] : node.incident_edges){
+        // prev_SL = SL;
+        // prev_SR = SR;
 
-                //if it is not in the map it means it is on the right side R\SR
-                if(SR.find(G.nodes[to]) == SR.end()){
+        
 
-                    G.edge_list[node.id][position].capacity = 2 *  G.edge_list[node.id][position].capacity;
+        for (int u : G.L) {
 
+            if(!SL[u]) continue;
+            for(auto &e : G.edge_list[u]) {
+
+                int v = e.to;
+
+                if(find(G.R.begin(), G.R.end(), v) != G.R.end() && !SR[v]) {
+                    e.capacity *= 2.0;
+                    doubled_any = true;
                 }
 
             }
-
         }
 
-        print_graph(G);
+        //print_graph(G);
 
-        SL.clear();
-        SR.clear();
+        if(!doubled_any){
+            return;
+        }
+
+        // if(doubled_any && prev_flow == current_flow){
+        //     return;
+        // }
 
        // fo<<"We got flow : "<<flow<<"\n";
     }
 
+
+
+    return;
 
 
 

@@ -45,7 +45,7 @@ FlowNetwork build_flow_network(BipartiteGraph &G);
 
 
 
-double matching_or_cut(BipartiteGraph& G, double mu, double epsilon, map<Node, int>& SL, map<Node, int>& SR);
+double matching_or_cut(BipartiteGraph& G, double mu, double epsilon, vector<bool> &SL, vector<bool> &SR, double &current_flow);
 
 
 

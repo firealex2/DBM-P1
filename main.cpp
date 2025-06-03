@@ -52,7 +52,7 @@ int main(){
 
     robust_matching(G, mu, epsilon);
 
-    cout<<"I got here 2\n";
+    //cout<<"I got here 2\n";
             int u, v;
 
     print_graph(G);
@@ -87,6 +87,8 @@ int main(){
 
         //print_graph(G);
     }
+
+    //print_graph(G);
 
     fi.close();
 
