@@ -1,28 +1,34 @@
 #include "bipartite.h"
 #include <climits>
+#include <cstdlib>
+#include <exception>
 #include <iostream>
 #include <map>
 #include <queue>
+#include <string>
+#include <fstream>
 
 using namespace std;
 
 static map<int, int> pair_u, pair_v, dist;
 
+extern ofstream fo;
+
 
 void print_graph(BipartiteGraph G){
-    cout<<"Left partition (L): ";
+    fo<<"Left partition (L): ";
 
-    for(int u : G.L) cout << u << " ";
-    cout<<"\nRight partition (R): ";
+    for(int u : G.L) fo << u << " ";
+    fo<<"\nRight partition (R): ";
 
-    for(int u : G.R) cout << u << " ";
-    cout<<"\n\nEdges:\n:";
+    for(int u : G.R) fo << u << " ";
+    fo<<"\n\nEdges:\n:";
 
 
     for(int u = 0; u < G.edge_list.size(); u++){
         for(const auto& e : G.edge_list[u]) {
             if(u < e.to)
-                cout<< u << " -- " << e.to << "(cap = " << e.capacity << ")\n";
+                fo<< u << " -- " << e.to << "(cap = " << e.capacity << ")\n";
         }
     }
 };
@@ -123,4 +129,26 @@ double hopcroft_karp(const BipartiteGraph& G){
     }
 
     return matching;
+};
+
+
+void argument_parser(int argc, char* argv[], string &graph_name, string &removal_name, double &epsilon){
+
+    if(argc != 4) {
+        cerr << "Usage: " << argv[0] << " <graph-file> <epsilon> <removal-file>\n";
+        exit(1);
+    }
+
+    graph_name = argv[1];
+
+    try {
+        epsilon = stod(argv[2]);
+    }
+    catch (const exception &e) {
+        cerr << "Error: invalid epsilon value " << argv[2] << '\n';
+        exit(1);
+    }
+
+    removal_name = argv[3];
+
 };

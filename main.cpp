@@ -1,4 +1,5 @@
 #include <iostream>
+#include <sstream>
 #include <string>
 #include <fstream>
 #include "bipartite.h"
@@ -8,38 +9,48 @@
 
 using namespace std;
 
-
-ifstream fi("removals_128.txt");
-
-int main(){
+ofstream fo;
 
 
-
-    string test_name;
-
-    cout << "please enter your test file: ";
-    cin >> test_name;
-
-    BipartiteGraph G(test_name);
-
-    cout<<"Graph successfully loaded;\n";
-
-    //let's test with deletions
+int main(int argc, char *argv[]){
 
 
+
+
+    string test_name, removal_name;
     double epsilon, mu;
 
-    cout<<"please enter epsilon: ";
-    cin>>epsilon;
+    argument_parser(argc, argv, test_name, removal_name, epsilon);
+
+
+    BipartiteGraph G(test_name);
+    ifstream fi(removal_name);
+    if(!fi) {
+        cerr<< " Failed to open removal file "<< removal_name << '\n';
+        return 1;
+    }
+
+    fo<<"Graph successfully loaded;\n";
+
+
+    ostringstream oss;
+    oss << "i(" << test_name <<")_r("<<removal_name<<")_e(" << epsilon << ").out";
+
+    string out_file = oss.str();
+
+    fo.open(out_file);
+    if(!fo) {
+        cerr << "Error: Cannot open output file " << out_file << '\n';
+        return 1;
+    }
 
     int phase_counter = 0;
 
     mu =  hopcroft_karp(G);
 
-    cout<<"This is before phase start just initial data:\n";
-    cout<<"The maximum matching found is: " << mu;
-    cout<<"\n\n";
-
+    fo<<"This is before phase start just initial data:\n";
+    fo<<"The maximum matching found is: " << mu;
+    fo<<"\n\n";
 
 
     double value = 0;
@@ -47,50 +58,40 @@ int main(){
     print_graph(G);
 
 
-    cout<<"I got here 1\n";
+    fo<<"Start phase "<< phase_counter << " initial run \n ------------- \n";
 
 
     robust_matching(G, mu, epsilon);
 
-    //cout<<"I got here 2\n";
-            int u, v;
+    int u, v;
 
     print_graph(G);
 
     while(fi>>u>>v){
 
-
-        
-
-        //cout<<"I got here 2\n";
-
-
-
         value += G.remove_edge(u, v);
 
-        //cout<<"I got here 3 and value is: "<< value << "\n";
-       //cout<<"epsilon * mu = "<<epsilon * mu << endl;
         
         if(value >= epsilon * mu){
             //start phase
-            cout<<"Start phase "<<++phase_counter;
-            //print_graph(G);
+            fo<<"Start phase "<<++phase_counter;
+
+            fo<<"We enter robust matching: ...\n";
 
 
-
-            cout<<"We enter robust matching: ...\n";
             robust_matching(G, mu, epsilon);
 
 
             value = 0;
         }
 
-        //print_graph(G);
+
     }
 
-    //print_graph(G);
+
 
     fi.close();
+    fo.close();
 
     return 0;
 }

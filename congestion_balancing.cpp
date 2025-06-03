@@ -13,7 +13,7 @@
 
 using namespace std;
 
-ofstream fo("output.out");
+extern ofstream fo;
 
 
 
@@ -205,17 +205,9 @@ double matching_or_cut(BipartiteGraph& G, double mu, double epsilon, vector<bool
                 Q.push(e.to);
             }
 
-            // if(!reachable[e.to]) {
-            //     reachable[e.to] = true;
-            //     Q.push(e.to);
-            // }
-
         }
 
     }
-
-    // SL.clear();
-    // SR.clear();
 
     fill(SL.begin(), SL.end(), false);
     fill(SR.begin(), SR.end(), false);
@@ -277,30 +269,16 @@ void robust_matching(BipartiteGraph& G, double& mu, double epsilon){
 
     //if matching too small we return
     if(matching_too_small(G, mu, epsilon)){
-        fo<<"Matching too small"<<endl;
+        fo<<"Matching too small\n"<<endl;
         return;
     }
 
 
 
-    // vector<Node> SL, SR;
-
-    // SL.clear();
-    // SR.clear();
-
-    // map<Node, int> SL, SR;
-
-    // SL.clear();
-    // SR.clear();
 
     //initialize the cuts as bool 
     vector <bool> SL (G.nr_nodes, false);
     vector <bool> SR (G.nr_nodes, false);
-
-    // vector <bool> prev_SL (G.nr_nodes, false);
-    // vector <bool> prev_SR (G.nr_nodes, false);
-
-
 
 
 
@@ -310,7 +288,7 @@ void robust_matching(BipartiteGraph& G, double& mu, double epsilon){
     //while we do not find a matching
     while (true) {
 
-            fo<<"NEW MU is: "<<mu<<endl;
+        fo<<"NEW MU is: "<<mu<<endl;
 
         bool doubled_any = false;
 
@@ -324,12 +302,12 @@ void robust_matching(BipartiteGraph& G, double& mu, double epsilon){
         cout<<prev_flow << " " << current_flow << endl;
 
         if(flow >= 0 ){
-            cout<<"Exited bc found good flow\n";
+            cout<<"Exited: found good flow\n";
             return;
         }
 
         if(prev_flow == current_flow){
-            cout<<"Exited bc hard cap on doubling\n";
+            cout<<"Exited: hard cap on doubling\n";
             return;
         }
 
@@ -337,14 +315,6 @@ void robust_matching(BipartiteGraph& G, double& mu, double epsilon){
 
         fo<<"flow is: "<<flow<<endl;
 
-        // if(SL == prev_SL && SR == prev_SR){
-        //     return;
-        // }
-
-        // prev_SL = SL;
-        // prev_SR = SR;
-
-        
 
         for (int u : G.L) {
 
@@ -361,17 +331,10 @@ void robust_matching(BipartiteGraph& G, double& mu, double epsilon){
             }
         }
 
-        //print_graph(G);
-
         if(!doubled_any){
             return;
         }
 
-        // if(doubled_any && prev_flow == current_flow){
-        //     return;
-        // }
-
-       // fo<<"We got flow : "<<flow<<"\n";
     }
 
 

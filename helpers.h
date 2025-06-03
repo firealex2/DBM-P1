@@ -1,5 +1,6 @@
 // helper functions
 #pragma once
+#include <string>
 #include "bipartite.h"
 
 /* here we are going to have: 
@@ -33,3 +34,4 @@ double hopcroft_karp(const BipartiteGraph& G);
 
 double max_flow(BipartiteGraph g);
 
+void argument_parser(int argc, char* argv[], std::string &graph_name, std::string &removal_name, double &epsilon);
