@@ -30,20 +30,18 @@ $(TARGET): $(OBJS)
 clean:
 	rm -f $(OBJS) $(TARGET)
 
-# run_test: build, then run the binary on each graph/removal pair
-# Usage: make run_test           # uses EPS=0.1
-#        make run_test EPS=0.2   # uses EPS=0.2
+
 run_test: all
 	@echo "=== Running all tests with ε=$(EPS) ==="
 	@for g in rand_n*_p*.txt; do \
-	  case "$$g" in \
-	    *_removals.txt) continue ;; \
-	  esac; \
-	  r="$${g%.txt}_removals.txt"; \
-	  if [ -f "$$g" ] && [ -f "$$r" ]; then \
-	    echo "--- $$g + $$r (ε=$(EPS)) ---"; \
-	    ./$(TARGET) $$g $(EPS) $$r; \
-	  else \
-	    echo "!! Missing pair for $$g (need $$r), skipping"; \
-	  fi \
+	case "$$g" in \
+		*_removals.txt) continue ;; \
+	esac; \
+	r="$${g%.txt}_removals.txt"; \
+	if [ -f "$$g" ] && [ -f "$$r" ]; then \
+		echo "--- $$g + $$r (ε=$(EPS)) ---"; \
+		./$(TARGET) $$g $(EPS) $$r; \
+	else \
+		echo "!! Missing pair for $$g (need $$r), skipping"; \
+	fi \
 	done
