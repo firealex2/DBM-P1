@@ -7,6 +7,9 @@
 #include <queue>
 #include <string>
 #include <fstream>
+#include <random>
+#include <functional>
+
 
 using namespace std;
 
@@ -108,6 +111,7 @@ static bool dfs(int u, const BipartiteGraph& G){
 };
 
 
+//normal hopcroft karp
 double hopcroft_karp(const BipartiteGraph& G){
 
     pair_u.clear();
@@ -132,6 +136,10 @@ double hopcroft_karp(const BipartiteGraph& G){
 };
 
 
+
+
+
+//parser for the arguments
 void argument_parser(int argc, char* argv[], string &graph_name, string &removal_name, double &epsilon){
 
     if(argc != 4) {
@@ -152,3 +160,113 @@ void argument_parser(int argc, char* argv[], string &graph_name, string &removal
     removal_name = argv[3];
 
 };
+
+//approx Hopcroft Karp
+double HK_approx(BipartiteGraph &G, int L) {
+    int n = G.nr_nodes;
+    const vector<int> &Lnodes = G.L, &Rnodes = G.R;
+    int NL = (int)Lnodes.size(), NR = (int)Rnodes.size();
+
+
+    vector<int> pairU(n, -1), pairV(n, -1);
+
+
+    vector<int> dist(n, -1);
+    queue<int> Q;
+
+    //BFS that only explores up to depth = 2*L+1
+    auto bfs_limited = [&](int max_depth) -> bool {
+        fill(dist.begin(), dist.end(), -1);
+        // Start from all free U-nodes
+        for (int u : Lnodes) {
+            if (pairU[u] == -1) {
+                dist[u] = 0;
+                Q.push(u);
+            }
+        }
+        bool found_augmenting = false;
+        while (!Q.empty()) {
+            int u = Q.front(); Q.pop();
+            if (dist[u] >= max_depth) continue;
+            for (auto &e : G.edge_list[u]) {
+                if(e.capacity <= 0) continue;
+                int v = e.to;
+                int pu = pairV[v];
+                if (pu == -1) {
+                    //we found a free v at depth ≤ max_depth
+                    found_augmenting = true;
+                } else if (dist[pu] == -1) {
+                    dist[pu] = dist[u] + 2;   //u->v->pu adds 2
+                    if (dist[pu] <= max_depth)
+                        Q.push(pu);
+                }
+            }
+        }
+        return found_augmenting;
+    };
+
+    //DFS to find augmenting paths within the layering
+    function<bool(int,int)> dfs = [&](int u, int max_depth) -> bool {
+        for (auto &e : G.edge_list[u]) {
+            if(e.capacity <= 0) continue;
+            int v = e.to;
+            int pu = pairV[v];
+            //either v free, or v->pu is next layer
+            if ((pu == -1 && dist[u] + 1 <= max_depth) ||
+                (pu != -1 && dist[pu] == dist[u] + 2)) {
+                //attempt to use this edge
+                if (pu == -1 || dfs(pu, max_depth)) {
+                    pairU[u] = v;
+                    pairV[v] = u;
+                    return true;
+                }
+            }
+        }
+        dist[u] = -1;  
+        return false;
+    };
+
+    int matching = 0;
+    int max_depth = 2*L + 1;
+
+    for (int phase = 0; phase < L; phase++) {
+        if (!bfs_limited(max_depth)) break;
+        //for each free u, try to find an augmenting path
+        for (int u : Lnodes) {
+            if (pairU[u] == -1) {
+                if (dfs(u, max_depth)) {
+                    matching++;
+                }
+            }
+        }
+    }
+
+    return (double)matching;
+}
+
+void write_random_bipartite(const std::string &filename, int n, double p) {
+
+    //this function will generate random bipartite graphs for testing
+    //i am using p as a probability to include an edge in the graph test
+    //moved to separate file
+
+
+    mt19937_64 rng(random_device{}());
+
+    uniform_real_distribution<double> U(0, 1);
+
+    ofstream fout(filename);
+
+    fout<< (2*n) << '\n';
+
+    for(int u=0; u < n; u++){
+        for(int v = n; v < 2*n; v++){
+            if(U(rng) < p){
+                fout<< u << " " << v << "\n";
+            }
+        }
+    }
+
+    fout.close();
+
+}

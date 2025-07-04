@@ -12,6 +12,8 @@
     - hopcroft karp
 
 */
+using namespace std;
+
 
 
 static bool bfs(const BipartiteGraph& G);
@@ -31,7 +33,11 @@ Stop when no more augmenting paths exist
 returns the size of the matching
 */
 double hopcroft_karp(const BipartiteGraph& G);
+double HK_approx(BipartiteGraph &G, int L);
 
 double max_flow(BipartiteGraph g);
 
 void argument_parser(int argc, char* argv[], std::string &graph_name, std::string &removal_name, double &epsilon);
+
+
+void write_random_bipartite(const std::string &filename, int n, double p);

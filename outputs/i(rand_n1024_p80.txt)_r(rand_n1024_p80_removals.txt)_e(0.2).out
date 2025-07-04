@@ -1,0 +1,69 @@
+This is before phase start just initial data:
+The maximum matching found is: 1024
+
+ << Start phase 0 initial run 
+ ------------- 
+IN ROBUST MATCHING TOO SMALL: 
+-------------
+IN MATCHING TOO SMALL: 
+-------------
+CALCULATED MU IS: 1024
+NEW MU is: 1024
+IN MATCHING OR CUT: 
+-------------
+FLOW CALCULATED IS: 819.343 ----------- 
+THRESHOLD IS: -5.68434e-14 ----------- 
+Exited: found good flow
+ << Start phase 1>> 
+
+We enter robust matching: ...
+IN ROBUST MATCHING TOO SMALL: 
+-------------
+IN MATCHING TOO SMALL: 
+-------------
+CALCULATED MU IS: 1024
+NEW MU is: 1024
+IN MATCHING OR CUT: 
+-------------
+FLOW CALCULATED IS: 614.542 ----------- 
+THRESHOLD IS: -5.68434e-14 ----------- 
+Exited: found good flow
+ << Start phase 2>> 
+
+We enter robust matching: ...
+IN ROBUST MATCHING TOO SMALL: 
+-------------
+IN MATCHING TOO SMALL: 
+-------------
+CALCULATED MU IS: 1024
+NEW MU is: 1024
+IN MATCHING OR CUT: 
+-------------
+FLOW CALCULATED IS: 409.741 ----------- 
+THRESHOLD IS: -5.68434e-14 ----------- 
+Exited: found good flow
+ << Start phase 3>> 
+
+We enter robust matching: ...
+IN ROBUST MATCHING TOO SMALL: 
+-------------
+IN MATCHING TOO SMALL: 
+-------------
+CALCULATED MU IS: 1024
+NEW MU is: 1024
+IN MATCHING OR CUT: 
+-------------
+FLOW CALCULATED IS: 204.94 ----------- 
+THRESHOLD IS: -5.68434e-14 ----------- 
+Exited: found good flow
+ << Start phase 4>> 
+
+We enter robust matching: ...
+IN ROBUST MATCHING TOO SMALL: 
+-------------
+IN MATCHING TOO SMALL: 
+-------------
+CALCULATED MU IS: 126
+Matching too small
+
+Matching too small

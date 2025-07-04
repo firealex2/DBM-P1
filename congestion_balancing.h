@@ -51,5 +51,5 @@ double matching_or_cut(BipartiteGraph& G, double mu, double epsilon, vector<bool
 
 bool matching_too_small(BipartiteGraph& G, double& mu, double epsilon);
 
-void robust_matching(BipartiteGraph& G, double& mu, double epsilon);
+int robust_matching(BipartiteGraph& G, double& mu, double epsilon, int& doublings);
 

@@ -165,7 +165,7 @@ double matching_or_cut(BipartiteGraph& G, double mu, double epsilon, vector<bool
 
 
     //double threshold = G.L.size() * (1 - epsilon);
-    double threshold = mu * (1 - 3 * epsilon);
+    double threshold = mu * (1 - 5 * epsilon);
     double flow = F.max_flow(s, t);
 
     //check flow (fractional matching size)
@@ -240,18 +240,18 @@ bool matching_too_small(BipartiteGraph& G, double& mu, double epsilon){
 
     fo<<"IN MATCHING TOO SMALL: \n"<<"-------------\n";
 
-    double aux = mu;
-    mu = hopcroft_karp(G);
+    int L = (int)ceil(1.0 / epsilon );
+    double mu_approx = HK_approx(G, L);
 
     //print_graph(G);
 
-    fo<<"CALCULATED MU IS: "<<mu<<endl;
+    fo<<"CALCULATED MU IS: "<<mu_approx<<endl;
 
-    return (mu < aux*(1 - 2*epsilon)) ? true : false; 
+    return (mu_approx < mu*(1 - 2*epsilon)) ? true : false; 
 
 }
 
-void robust_matching(BipartiteGraph& G, double& mu, double epsilon){
+int robust_matching(BipartiteGraph& G, double& mu, double epsilon, int& doublings){
 
     fo<<"IN ROBUST MATCHING TOO SMALL: \n"<<"-------------\n";
 
@@ -270,8 +270,8 @@ void robust_matching(BipartiteGraph& G, double& mu, double epsilon){
     //if matching too small we return
     if(matching_too_small(G, mu, epsilon)){
         fo<<"Matching too small\n"<<endl;
-        return;
-    }
+        return -1;
+    } 
 
 
 
@@ -302,14 +302,14 @@ void robust_matching(BipartiteGraph& G, double& mu, double epsilon){
         cout<<prev_flow << " " << current_flow << endl;
 
         if(flow >= 0 ){
-            cout<<"Exited: found good flow\n";
-            return;
+            fo<<"Exited: found good flow\n";
+            return 1;
         }
 
-        if(prev_flow == current_flow){
-            cout<<"Exited: hard cap on doubling\n";
-            return;
-        }
+        // if(prev_flow == current_flow){
+        //     fo<<"Exited: hard cap on doubling\n";
+        //     return 0;
+        // }
 
         prev_flow = current_flow;
 
@@ -324,7 +324,19 @@ void robust_matching(BipartiteGraph& G, double& mu, double epsilon){
                 int v = e.to;
 
                 if(find(G.R.begin(), G.R.end(), v) != G.R.end() && !SR[v]) {
+
+
+                    //fo<<"for " << u <<" ---- "<< v<<endl;
+                    //fo<<"THE CAPACITY IS: "<< e.capacity;
+
+
                     e.capacity *= 2.0;
+
+                    doublings++;
+
+                    //fo<<"AND IT BECOMES: " << e.capacity <<endl;
+
+
                     doubled_any = true;
                 }
 
@@ -332,14 +344,15 @@ void robust_matching(BipartiteGraph& G, double& mu, double epsilon){
         }
 
         if(!doubled_any){
-            return;
+            return 0;
         }
+       // print_graph(G);
 
     }
 
 
 
-    return;
+    return 0;
 
 
 

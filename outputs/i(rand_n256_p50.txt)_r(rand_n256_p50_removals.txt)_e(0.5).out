@@ -1,0 +1,30 @@
+This is before phase start just initial data:
+The maximum matching found is: 256
+
+ << Start phase 0 initial run 
+ ------------- 
+IN ROBUST MATCHING TOO SMALL: 
+-------------
+IN MATCHING TOO SMALL: 
+-------------
+CALCULATED MU IS: 256
+NEW MU is: 256
+IN MATCHING OR CUT: 
+-------------
+FLOW CALCULATED IS: 128.246 ----------- 
+THRESHOLD IS: -384 ----------- 
+Exited: found good flow
+ << Start phase 1>> 
+
+We enter robust matching: ...
+IN ROBUST MATCHING TOO SMALL: 
+-------------
+IN MATCHING TOO SMALL: 
+-------------
+CALCULATED MU IS: 52
+NEW MU is: 256
+IN MATCHING OR CUT: 
+-------------
+FLOW CALCULATED IS: 0.246094 ----------- 
+THRESHOLD IS: -384 ----------- 
+Exited: found good flow

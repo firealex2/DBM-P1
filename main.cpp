@@ -5,11 +5,16 @@
 #include "bipartite.h"
 #include "helpers.h"
 #include "congestion_balancing.h"
+#include <chrono>
 
 
 using namespace std;
 
 ofstream fo;
+
+ofstream results_csv;
+
+
 
 
 int main(int argc, char *argv[]){
@@ -38,6 +43,27 @@ int main(int argc, char *argv[]){
 
     string out_file = oss.str();
 
+
+    //do work for the opening csv
+
+    ostringstream csv_name; 
+
+    csv_name << "results_" << test_name << "_" << removal_name << "_e"<<epsilon << ".csv";
+
+    results_csv.open(csv_name.str());
+
+    results_csv << "n,p,epsilon,phases,doublings,time_ms\n";
+
+    //get the n and p from the name of the file
+
+    int nr_nodes, density_probability;
+
+    sscanf(test_name.c_str(), "rand_n%d_p%d.txt", &nr_nodes, &density_probability);
+
+    double density = density_probability / 100.0;
+
+    //open the output file
+
     fo.open(out_file);
     if(!fo) {
         cerr << "Error: Cannot open output file " << out_file << '\n';
@@ -55,17 +81,23 @@ int main(int argc, char *argv[]){
 
     double value = 0;
 
-    print_graph(G);
+    //print_graph(G);
+
+    auto t0 = chrono::steady_clock::now();
+
+    fo<<" << Start phase "<< phase_counter << " initial run \n ------------- \n";
 
 
-    fo<<"Start phase "<< phase_counter << " initial run \n ------------- \n";
 
+    int doublings = 0;
 
-    robust_matching(G, mu, epsilon);
+    robust_matching(G, mu, epsilon, doublings);
 
     int u, v;
 
-    print_graph(G);
+    //print_graph(G);
+
+    
 
     while(fi>>u>>v){
 
@@ -74,12 +106,32 @@ int main(int argc, char *argv[]){
         
         if(value >= epsilon * mu){
             //start phase
-            fo<<"Start phase "<<++phase_counter;
+            fo<<" << Start phase "<<++phase_counter << ">> \n\n";
 
             fo<<"We enter robust matching: ...\n";
 
 
-            robust_matching(G, mu, epsilon);
+            int err = robust_matching(G, mu, epsilon, doublings);
+            
+
+            //if matching too small was too small
+            if(err < 0){
+                
+
+                auto t1 = chrono::steady_clock::now();
+
+                fo<<"Matching too small\n";
+
+                double time_ms = chrono::duration_cast<chrono::milliseconds>(t1 - t0).count();
+
+                results_csv << nr_nodes << "," << density << "," << epsilon << "," << phase_counter << "," << doublings << "," << time_ms <<  "\n";
+
+                fi.close();
+                fo.close();
+                
+                results_csv.close();
+                return 1;
+            }
 
 
             value = 0;
@@ -88,8 +140,14 @@ int main(int argc, char *argv[]){
 
     }
 
+    auto t1 = chrono::steady_clock::now();
+    double time_ms = chrono::duration_cast<chrono::milliseconds>(t1 - t0).count();
 
 
+    results_csv << nr_nodes << "," << density << "," << epsilon << "," << phase_counter << "," << doublings << "," << time_ms <<  "\n";
+
+
+    results_csv.close();
     fi.close();
     fo.close();
 
