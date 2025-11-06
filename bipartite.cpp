@@ -38,10 +38,8 @@ BipartiteGraph::BipartiteGraph(string file_name){
 
     }
 
-    while(!fi.eof()){
-
-        int u, v;
-        fi>> u >> v;
+    int u, v;
+    while(fi >> u >> v){
 
         add_edge(u, v, 0);
 
@@ -56,10 +54,12 @@ BipartiteGraph::BipartiteGraph(string file_name){
 
     }
 
+    is_right.resize(n, false);
     for(int i=0; i<n; i++){
         if (nodes[i].partition == 0)
         {
             R.push_back(i);
+            is_right[i] = true;
         }
     }
 
@@ -82,10 +82,11 @@ BipartiteGraph::BipartiteGraph(string file_name){
 //initialization with number of nodes
 BipartiteGraph::BipartiteGraph(int n){
 
+    is_right.resize(n, false);
     for(int i=0;i<n;i++){
         vector<Edge> edge;
         edge_list.push_back(edge);
-        
+
 
         Node new_node;
         new_node.id = i;

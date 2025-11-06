@@ -270,3 +270,87 @@ void write_random_bipartite(const std::string &filename, int n, double p) {
     fout.close();
 
 }
+
+// Logging helper functions
+void log_separator(const string& title) {
+    fo << "\n" << string(80, '=') << "\n";
+    if (!title.empty()) {
+        fo << "  " << title << "\n";
+        fo << string(80, '=') << "\n";
+    }
+}
+
+void log_graph_state(const BipartiteGraph& G, const string& context) {
+    fo << "\n[GRAPH STATE" << (context.empty() ? "" : " - " + context) << "]\n";
+    fo << "  Total nodes: " << G.nr_nodes << "\n";
+    fo << "  Total edges: " << G.nr_edges << "\n";
+    fo << "  Left partition (L): " << G.L.size() << " nodes\n";
+    fo << "  Right partition (R): " << G.R.size() << " nodes\n";
+
+    // Calculate total capacity
+    double total_capacity = 0;
+    int active_edges = 0;
+    for (int u = 0; u < G.edge_list.size(); u++) {
+        for (const auto& e : G.edge_list[u]) {
+            if (e.capacity > 1e-9) {
+                total_capacity += e.capacity;
+                active_edges++;
+            }
+        }
+    }
+    // Divide by 2 since edges are stored bidirectionally
+    fo << "  Active edges: " << active_edges / 2 << "\n";
+    fo << "  Total capacity: " << total_capacity / 2 << "\n";
+}
+
+void log_phase_start(int phase_num, double mu, double epsilon, double accumulated_weight) {
+    log_separator("PHASE " + to_string(phase_num) + " START");
+    fo << "  Current mu: " << mu << "\n";
+    fo << "  Epsilon: " << epsilon << "\n";
+    fo << "  Accumulated removed weight: " << accumulated_weight << "\n";
+    fo << "  Trigger threshold (epsilon * mu): " << epsilon * mu << "\n";
+    fo << "  Target flow threshold (mu * (1 - 5*epsilon)): " << mu * (1 - 5 * epsilon) << "\n";
+}
+
+void log_matching_or_cut_result(double flow, double threshold, bool found_matching) {
+    fo << "\n[MATCHING_OR_CUT RESULT]\n";
+    fo << "  Computed flow: " << flow << "\n";
+    fo << "  Required threshold: " << threshold << "\n";
+    fo << "  Flow >= Threshold? " << (flow >= threshold ? "YES" : "NO") << "\n";
+
+    if (found_matching) {
+        fo << "  ✓ Found valid matching!\n";
+    } else {
+        fo << "  ✗ Flow too low - extracting cut for congestion balancing\n";
+    }
+}
+
+void log_cut_info(const BipartiteGraph& G, const vector<bool>& SL, const vector<bool>& SR) {
+    fo << "\n[CUT INFORMATION]\n";
+
+    int sl_count = 0, sr_count = 0;
+    for (int u : G.L) if (SL[u]) sl_count++;
+    for (int v : G.R) if (SR[v]) sr_count++;
+
+    fo << "  Reachable in L (SL): " << sl_count << " nodes\n";
+    fo << "  Reachable in R (SR): " << sr_count << " nodes\n";
+    fo << "  Unreachable in R (R\\SR): " << (G.R.size() - sr_count) << " nodes\n";
+
+    // Count edges crossing the cut (from SL to R\SR)
+    int crossing_edges = 0;
+    for (int u : G.L) {
+        if (!SL[u]) continue;
+        for (const auto& e : G.edge_list[u]) {
+            if (G.is_right[e.to] && !SR[e.to] && e.capacity > 1e-9) {
+                crossing_edges++;
+            }
+        }
+    }
+    fo << "  Edges crossing cut (SL → R\\SR): " << crossing_edges << "\n";
+}
+
+void log_doublings(int total_doublings, int this_iteration) {
+    fo << "\n[CAPACITY DOUBLINGS]\n";
+    fo << "  Doubled in this iteration: " << this_iteration << "\n";
+    fo << "  Total doublings so far: " << total_doublings << "\n";
+}

@@ -41,3 +41,11 @@ void argument_parser(int argc, char* argv[], std::string &graph_name, std::strin
 
 
 void write_random_bipartite(const std::string &filename, int n, double p);
+
+// Logging helper functions
+void log_separator(const std::string& title = "");
+void log_graph_state(const BipartiteGraph& G, const std::string& context = "");
+void log_phase_start(int phase_num, double mu, double epsilon, double accumulated_weight);
+void log_matching_or_cut_result(double flow, double threshold, bool found_matching);
+void log_cut_info(const BipartiteGraph& G, const std::vector<bool>& SL, const std::vector<bool>& SR);
+void log_doublings(int total_doublings, int this_iteration);

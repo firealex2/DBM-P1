@@ -26,6 +26,7 @@ public:
     vector< vector<FlowEdge> > adj;
     vector <int> level, ptr;
     const double INF = numeric_limits<double>::max();
+    double max_capacity;
 
     FlowNetwork(int nodes);
     

@@ -3,7 +3,7 @@
 #pragma once
 #include <vector>
 #include <string>
-#include <map>
+#include <unordered_map>
 
 
 struct Edge {
@@ -17,11 +17,11 @@ struct Edge {
 struct Node {
 
     int id;
-    
+
     //1 if left and 0 if right
     int partition;
     //array that for each i returns the id in the global edges
-    std::map<int, int> incident_edges;
+    std::unordered_map<int, int> incident_edges;
 
     bool operator<(const Node& other) const {
         return id < other.id;
@@ -44,6 +44,9 @@ public:
 
     //sets for left and right in bipartite graph
     std::vector<int> L, R;
+
+    //fast partition lookup: is_right[v] = true if v ∈ R
+    std::vector<bool> is_right;
 
     //adjacency edge list
     std::vector< std::vector<Edge> > edge_list;
